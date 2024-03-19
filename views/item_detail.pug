@@ -1,0 +1,19 @@
+extends layout 
+
+block content 
+    div(class='row')
+        div(class="card blue-grey lighten-5")
+            div(class="card-content grey-text darken-4")
+                span(class="card-title") #[strong #{title}:] #[strong #{item.name}]
+                h6 #[strong Description]
+                div(class="card-panel blue-grey lighten-2 white-text") 
+                    p #{item.description} 
+                h6 #[strong Category:] #[a(href=item.category.url) #{item.category.name}] 
+                h6 #[strong Price:] #{item.price_text}
+                if item.quantity > 0
+                    h6 #[strong Quantity:] #{item.quantity}
+                else
+                    h6 #[strong Out of stock.]
+            div(class="card-action center-align ")
+                a(class="blue-grey-text darken-2" href=item.url+'/delete') Delete item
+                a(class="blue-grey-text darken-2" href=item.url+'/update') Update item

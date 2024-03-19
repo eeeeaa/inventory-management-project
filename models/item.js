@@ -20,4 +20,11 @@ ItemSchema.virtual("url").get(function () {
   return `/inventory/item/${this._id}`;
 });
 
+ItemSchema.virtual("price_text").get(function () {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "USD",
+  }).format(this.price);
+});
+
 module.exports = mongoose.model("Item", ItemSchema);

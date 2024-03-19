@@ -1,0 +1,21 @@
+extends layout 
+
+block content 
+    div(class='row')
+        div(class="card blue-grey lighten-5")
+            div(class="card-content grey-text darken-4")
+                span(class="card-title") #[strong #{title}:] #[strong #{category.name}]
+                h6 #[strong Description]
+                div(class="card-panel blue-grey lighten-2 white-text") 
+                    p #{category.description} 
+                if item_list.length 
+                    ul(class="collection")
+                        each item in item_list 
+                            li(class="collection-item")
+                                a(class="truncate" href=item.url) #{item.name} 
+                                p(class="truncate") #{item.description}
+                else 
+                    p There are no items in this category.
+            div(class="card-action center-align ")
+                a(class="blue-grey-text darken-2" href=category.url+'/delete') Delete category
+                a(class="blue-grey-text darken-2" href=category.url+'/update') Update category

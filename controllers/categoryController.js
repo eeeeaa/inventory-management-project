@@ -1,14 +1,37 @@
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
 
+const Item = require("../models/item");
 const Category = require("../models/category");
 
 exports.category_list = asyncHandler(async (req, res, next) => {
-  res.send("NOT implemented: get list of category");
+  const allCategories = await Category.find().sort({ name: 1 }).exec();
+
+  res.render("category_list", {
+    title: "Category list",
+    category_list: allCategories,
+  });
 });
 
 exports.category_detail = asyncHandler(async (req, res, next) => {
-  res.send("NOT implemented: get category detail");
+  const [category, allItemsInCategory] = await Promise.all([
+    Category.findById(req.params.id).exec(),
+    Item.find({ category: req.params.id }, "name description")
+      .sort({ name: 1 })
+      .exec(),
+  ]);
+
+  if (category == null) {
+    const err = new Error("Category not found");
+    err.status = 404;
+    return next(err);
+  }
+
+  res.render("category_detail", {
+    title: "Category Detail",
+    category: category,
+    item_list: allItemsInCategory,
+  });
 });
 
 exports.category_create_get = asyncHandler(async (req, res, next) => {
