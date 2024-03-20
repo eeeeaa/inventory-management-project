@@ -1,0 +1,42 @@
+extends layout
+
+block content
+    h1=title
+
+    form(method="POST").col.s12
+        div.row.center-align
+            div.input-field.col.s12
+                i.small.material-icons.prefix edit
+                label.active(for='name') Name: 
+                input#name.validate(type='text' placeholder='Item name' name='name' required value=(undefined===item ? '' : item.name) )
+            div.input-field.col.s12
+                i.small.material-icons.prefix edit
+                label.active(for='description') Description: 
+                textarea#description.materialize-textarea(placeholder='Description' name='description' required)= undefined===item ? '' : item.description
+            div.input-field.col.s12
+                label.active(for="category") Category: 
+                select#category.browser-default(name='category' required)
+                    option(value='' disabled) --Please select a category--
+                    for category in categories
+                        if category
+                            if category._id.toString()=== (undefined===item ? '' : item.category._id.toString())
+                                option(value=category._id selected) #{category.name}
+                            else
+                                option(value=category._id) #{category.name}
+                        else
+                            option(value=category._id) #{category.name}
+            div.input-field.col.s6
+                i.small.material-icons.prefix attach_money
+                label.active(for='price') Price:
+                input#price.validate(type="number" step="0.01" name='price' min='0' required value=(undefined===item ? 0 : item.price) ) 
+            div.input-field.col.s6
+                i.small.material-icons.prefix shopping_basket
+                label.active(for='quantity') Quantity:
+                input#quantity.validate(type="number" name='quantity' min='0' required value=(undefined===item ? 0 : item.quantity) ) 
+            button.btn.waves-effect.teal.accent-4(type="submit") Submit
+                i.material-icons.right send
+
+    if errors
+        ul
+            for error in errors
+                li!= error.msg
