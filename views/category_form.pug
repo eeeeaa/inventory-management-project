@@ -1,0 +1,21 @@
+extends layout
+
+block content
+    h1=title
+
+    form(method="POST").col.s12
+        div.row.center-align
+            div.input-field.col.s12
+                i.small.material-icons.prefix edit
+                label.active(for='name') Name: 
+                input#name.validate(type='text' placeholder='Category name' name='name' required value=(undefined===category ? '' : category.name) )
+            div.input-field.col.s12
+                i.small.material-icons.prefix edit
+                label.active(for='description') Description: 
+                textarea#description.materialize-textarea(placeholder='Description' name='description' required)= undefined===category ? '' : category.description
+            button.btn.waves-effect.teal.accent-4(type="submit") Submit
+                i.material-icons.right send
+    if errors
+        ul
+            for error in errors
+                li!= error.msg
