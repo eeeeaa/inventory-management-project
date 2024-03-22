@@ -70,21 +70,25 @@ exports.category_create_post = [
 ];
 
 exports.category_delete_get = asyncHandler(async (req, res, next) => {
-  const [category, allItemsInCategory] = await Promise.all([
-    Category.findById(req.params.id).exec(),
-    Item.find({ category: req.params.id }, "name description")
-      .sort({ name: 1 })
-      .exec(),
-  ]);
-
-  if (category === null) {
-    res.redirect("/inventory/categories");
+  if (!req.session.loggedIn) {
+    res.redirect("/auth");
   } else {
-    res.render("category_delete", {
-      title: "Delete Category",
-      category: category,
-      item_list: allItemsInCategory,
-    });
+    const [category, allItemsInCategory] = await Promise.all([
+      Category.findById(req.params.id).exec(),
+      Item.find({ category: req.params.id }, "name description")
+        .sort({ name: 1 })
+        .exec(),
+    ]);
+
+    if (category === null) {
+      res.redirect("/inventory/categories");
+    } else {
+      res.render("category_delete", {
+        title: "Delete Category",
+        category: category,
+        item_list: allItemsInCategory,
+      });
+    }
   }
 });
 
@@ -112,15 +116,22 @@ exports.category_delete_post = asyncHandler(async (req, res, next) => {
 });
 
 exports.category_update_get = asyncHandler(async (req, res, next) => {
-  const category = await Category.findById(req.params.id).exec();
+  if (!req.session.loggedIn) {
+    res.redirect("/auth");
+  } else {
+    const category = await Category.findById(req.params.id).exec();
 
-  if (category === null) {
-    const err = new Error("Category not found");
-    err.status = 404;
-    return next(err);
+    if (category === null) {
+      const err = new Error("Category not found");
+      err.status = 404;
+      return next(err);
+    }
+
+    res.render("category_form", {
+      title: "Create Category",
+      category: category,
+    });
   }
-
-  res.render("category_form", { title: "Create Category", category: category });
 });
 
 exports.category_update_post = [

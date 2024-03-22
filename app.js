@@ -2,6 +2,7 @@ const createError = require("http-errors");
 const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
+const session = require("express-session");
 const logger = require("morgan");
 const compression = require("compression");
 const helmet = require("helmet");
@@ -9,6 +10,7 @@ const helmet = require("helmet");
 // Setup routers
 const indexRouter = require("./routes/index");
 const inventoryRouter = require("./routes/inventory");
+const authRouter = require("./routes/auth");
 
 const app = express();
 
@@ -41,6 +43,15 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(
+  session({
+    secret: "Keep it secret",
+    name: "uniqueSessionID",
+    saveUninitialized: false,
+    store: new session.MemoryStore(),
+    resave: false,
+  })
+);
 
 //use compression to reduce time to transfer data between client/server
 app.use(compression());
@@ -58,6 +69,7 @@ app.use(
 
 // Routing
 app.use("/", indexRouter);
+app.use("/auth", authRouter);
 app.use("/inventory", inventoryRouter);
 
 // catch 404 and forward to error handler

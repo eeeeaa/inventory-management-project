@@ -78,15 +78,19 @@ exports.item_create_post = [
 ];
 
 exports.item_delete_get = asyncHandler(async (req, res, next) => {
-  const item = await Item.findById(req.params.id).exec();
+  if (!req.session.loggedIn) {
+    res.redirect("/auth");
+  } else {
+    const item = await Item.findById(req.params.id).exec();
 
-  if (item === null) {
-    const err = new Error("Item not found");
-    err.status = 404;
-    return next(err);
+    if (item === null) {
+      const err = new Error("Item not found");
+      err.status = 404;
+      return next(err);
+    }
+
+    res.render("item_delete", { title: "Delete Item", item: item });
   }
-
-  res.render("item_delete", { title: "Delete Item", item: item });
 });
 
 exports.item_delete_post = asyncHandler(async (req, res, next) => {
@@ -100,15 +104,19 @@ exports.item_delete_post = asyncHandler(async (req, res, next) => {
 });
 
 exports.item_update_get = asyncHandler(async (req, res, next) => {
-  const [item, allCategories] = await Promise.all([
-    Item.findById(req.params.id).exec(),
-    Category.find({}, "name").sort({ name: 1 }).exec(),
-  ]);
-  res.render("item_form", {
-    title: "Update Item",
-    item: item,
-    categories: allCategories,
-  });
+  if (!req.session.loggedIn) {
+    res.redirect("/auth");
+  } else {
+    const [item, allCategories] = await Promise.all([
+      Item.findById(req.params.id).exec(),
+      Category.find({}, "name").sort({ name: 1 }).exec(),
+    ]);
+    res.render("item_form", {
+      title: "Update Item",
+      item: item,
+      categories: allCategories,
+    });
+  }
 });
 
 exports.item_update_post = [
