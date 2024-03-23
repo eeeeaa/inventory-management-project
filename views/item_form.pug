@@ -3,8 +3,12 @@ extends layout
 block content
     h1=title
 
-    form(method="POST").col.s12
+    form(method="POST" enctype="multipart/form-data").col.s12
         div.row.center-align
+            div.input-field.col.s12
+                i.small.material-icons.prefix camera_alt
+                label.active(for='image') Image: 
+                input#image.validate(type='file' name='image')
             div.input-field.col.s12
                 i.small.material-icons.prefix edit
                 label.active(for='name') Name: 

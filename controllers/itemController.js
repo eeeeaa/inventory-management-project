@@ -1,5 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
+const imageUploader = require("../utils/imageUploader");
+const upload = require("../utils/multer");
 
 const Item = require("../models/item");
 const Category = require("../models/category");
@@ -31,6 +33,7 @@ exports.item_create_get = asyncHandler(async (req, res, next) => {
 });
 
 exports.item_create_post = [
+  upload.single("image"),
   body("name")
     .trim()
     .isLength({ min: 1 })
@@ -71,6 +74,10 @@ exports.item_create_post = [
         errors: errors.array(),
       });
     } else {
+      const result = await imageUploader.ItemUploader(req);
+
+      item.imageUrl = result.secure_url;
+
       await item.save();
       res.redirect(item.url);
     }

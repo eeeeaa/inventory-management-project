@@ -3,6 +3,9 @@ extends layout
 block content 
     div(class='row')
         div(class="card blue-grey lighten-5")
+            if item.imageUrl 
+                div(class="card-image")
+                    img(src=item.imageUrl alt=item.name)
             div(class="card-content grey-text darken-4")
                 span(class="card-title") #[strong #{title}:] #[strong #{item.name}]
                 h6 #[strong Description]

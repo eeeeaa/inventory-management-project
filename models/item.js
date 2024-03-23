@@ -14,6 +14,7 @@ const ItemSchema = new Schema({
     get: (v) => Math.round(v),
     set: (v) => Math.round(v),
   },
+  imageUrl: { type: String },
 });
 
 ItemSchema.virtual("url").get(function () {
