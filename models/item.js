@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const cloudinaryUtils = require("../utils/cloudinaryUtils");
 const Schema = mongoose.Schema;
 
 const ItemSchema = new Schema({
@@ -14,11 +14,15 @@ const ItemSchema = new Schema({
     get: (v) => Math.round(v),
     set: (v) => Math.round(v),
   },
-  imageUrl: { type: String },
+  publicId: { type: String },
 });
 
 ItemSchema.virtual("url").get(function () {
   return `/inventory/item/${this._id}`;
+});
+
+ItemSchema.virtual("imageUrl").get(function () {
+  return cloudinaryUtils.getImageUrl(this.publicId);
 });
 
 ItemSchema.virtual("price_text").get(function () {

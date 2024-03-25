@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
-const imageUploader = require("../utils/imageUploader");
+const cloudinaryUtils = require("../utils/cloudinaryUtils");
 const upload = require("../utils/multer");
 
 const Item = require("../models/item");
@@ -74,9 +74,10 @@ exports.item_create_post = [
         errors: errors.array(),
       });
     } else {
-      const result = await imageUploader.ItemUploader(req);
-
-      item.imageUrl = result.secure_url;
+      if (req.file) {
+        const result = await cloudinaryUtils.ItemUpload(req, item._id);
+        item.publicId = result.public_id;
+      }
 
       await item.save();
       res.redirect(item.url);
@@ -101,11 +102,20 @@ exports.item_delete_get = asyncHandler(async (req, res, next) => {
 });
 
 exports.item_delete_post = asyncHandler(async (req, res, next) => {
+  //TODO also delete image if exist!
   const item = await Item.findById(req.params.id).exec();
   if (item === null) {
     res.redirect("/inventory/items");
   } else {
-    await Item.findByIdAndDelete(req.body.itemid);
+    if (item.publicId) {
+      await Promise.all([
+        cloudinaryUtils.ItemDelete(item.publicId),
+        Item.findByIdAndDelete(req.body.itemid),
+      ]);
+    } else {
+      await Item.findByIdAndDelete(req.body.itemid);
+    }
+
     res.redirect("/inventory/items");
   }
 });
@@ -127,6 +137,7 @@ exports.item_update_get = asyncHandler(async (req, res, next) => {
 });
 
 exports.item_update_post = [
+  upload.single("image"),
   body("name")
     .trim()
     .isLength({ min: 1 })
@@ -145,6 +156,7 @@ exports.item_update_post = [
     .isInt({ min: 0 })
     .withMessage("Quantity should not be empty"),
   asyncHandler(async (req, res, next) => {
+    //TODO replace old image if new one is uploaded!!!
     const errors = validationResult(req);
 
     const item = new Item({
@@ -168,6 +180,12 @@ exports.item_update_post = [
         errors: errors.array(),
       });
     } else {
+      if (req.file) {
+        //upload new image
+        const result = await cloudinaryUtils.ItemUpload(req, item._id, true);
+        item.publicId = result.public_id;
+      }
+
       const updatedItem = await Item.findByIdAndUpdate(req.params.id, item, {});
       res.redirect(updatedItem.url);
     }
