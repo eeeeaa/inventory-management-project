@@ -13,7 +13,13 @@ const getUri = (req) => {
 
 exports.getImageUrl = function (publicId) {
   if (publicId) {
-    return cloudinary.url(publicId, { invalidate: true });
+    return cloudinary.url(publicId, {
+      aspect_ratio: "1.0",
+      width: 250,
+      height: 200,
+      crop: "fill",
+      invalidate: true,
+    });
   } else {
     return "";
   }
